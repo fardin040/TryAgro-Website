@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 ?>
+    </div>
 </main>
 <footer>
-    <p>&copy; <?php echo date('Y'); ?> <?php echo SITE_NAME; ?></p>
+    <div class="container">
+        <p>&copy; <?php echo date('Y'); ?> <?php echo SITE_NAME; ?></p>
+    </div>
 </footer>
-<script src="/assets/js/app.js"></script>
 </body>
 </html>
