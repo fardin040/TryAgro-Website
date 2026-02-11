@@ -3,6 +3,16 @@
     var menuToggle = document.querySelector('.menu-toggle');
     var siteNav = document.querySelector('.site-nav');
 
+    function closeMenu() {
+        if (!menuToggle || !siteNav) {
+            return;
+        }
+
+        siteNav.classList.remove('is-open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        body.classList.remove('menu-open');
+    }
+
     if (menuToggle && siteNav) {
         menuToggle.addEventListener('click', function () {
             var isOpen = siteNav.classList.toggle('is-open');
@@ -13,11 +23,21 @@
         siteNav.querySelectorAll('a').forEach(function (link) {
             link.addEventListener('click', function () {
                 if (window.matchMedia('(max-width: 47.99rem)').matches) {
-                    siteNav.classList.remove('is-open');
-                    menuToggle.setAttribute('aria-expanded', 'false');
-                    body.classList.remove('menu-open');
+                    closeMenu();
                 }
             });
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeMenu();
+            }
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!siteNav.contains(event.target) && !menuToggle.contains(event.target)) {
+                closeMenu();
+            }
         });
     }
 
@@ -45,8 +65,10 @@
         showSlide((current + 1) % slides.length);
     }
 
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     function startRotation() {
-        if (slides.length < 2) {
+        if (slides.length < 2 || reduceMotion) {
             return;
         }
 
@@ -64,6 +86,7 @@
                 dot.className = 'slider-dot';
                 dot.type = 'button';
                 dot.setAttribute('role', 'tab');
+                dot.setAttribute('aria-selected', 'false');
                 dot.setAttribute('aria-label', 'Slide ' + (index + 1));
                 dot.addEventListener('click', function () {
                     showSlide(index);
@@ -83,7 +106,7 @@
             var target = targetId ? document.getElementById(targetId) : null;
             if (target) {
                 event.preventDefault();
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
             }
         });
     });

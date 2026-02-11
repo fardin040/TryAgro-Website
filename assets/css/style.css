@@ -26,6 +26,12 @@ html, body {
 a { color: var(--primary); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+
+:focus-visible {
+    outline: 3px solid rgba(47, 122, 64, 0.35);
+    outline-offset: 2px;
+}
+
 .container {
     width: min(100% - 2rem, var(--container));
     margin-inline: auto;
@@ -89,6 +95,10 @@ a:hover { text-decoration: underline; }
 .menu-toggle__icon::before { transform: translateY(-5px); }
 .menu-toggle__icon::after { transform: translateY(3px); }
 
+.menu-toggle[aria-expanded="true"] .menu-toggle__icon { background: transparent; }
+.menu-toggle[aria-expanded="true"] .menu-toggle__icon::before { transform: translateY(0) rotate(45deg); }
+.menu-toggle[aria-expanded="true"] .menu-toggle__icon::after { transform: translateY(-2px) rotate(-45deg); }
+
 .site-nav {
     position: absolute;
     left: 0;
@@ -108,6 +118,8 @@ a:hover { text-decoration: underline; }
     opacity: 1;
     pointer-events: auto;
 }
+
+body.menu-open { overflow: hidden; }
 
 .site-nav ul {
     list-style: none;
@@ -243,6 +255,7 @@ input, select, textarea {
 }
 
 @media (min-width: 48rem) {
+    body.menu-open { overflow: auto; }
     .menu-toggle { display: none; }
 
     .site-nav {
