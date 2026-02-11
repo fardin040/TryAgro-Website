@@ -109,6 +109,13 @@ function is_admin_logged_in(): bool
     return !empty($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true;
 }
 
+function require_admin_auth(): void
+{
+    if (!is_admin_logged_in()) {
+        redirect('/admin/login.php');
+    }
+}
+
 function redirect(string $path): never
 {
     header('Location: ' . $path);
@@ -184,4 +191,48 @@ function validate_uploaded_image(
     }
 
     return $errors;
+}
+
+function csrf_token(): string
+{
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+
+    return (string) $_SESSION['csrf_token'];
+}
+
+function verify_csrf_token(?string $token): bool
+{
+    $sessionToken = (string) ($_SESSION['csrf_token'] ?? '');
+
+    return $sessionToken !== '' && $token !== null && hash_equals($sessionToken, $token);
+}
+
+function require_valid_csrf_or_redirect(string $redirectPath): void
+{
+    $token = isset($_POST['csrf_token']) ? (string) $_POST['csrf_token'] : null;
+
+    if (!verify_csrf_token($token)) {
+        $_SESSION['flash_error'] = 'Invalid CSRF token. Please try again.';
+        redirect($redirectPath);
+    }
+}
+
+function set_flash_message(string $type, string $message): void
+{
+    $_SESSION['flash_' . $type] = $message;
+}
+
+function get_flash_message(string $type): ?string
+{
+    $key = 'flash_' . $type;
+    if (!isset($_SESSION[$key])) {
+        return null;
+    }
+
+    $message = (string) $_SESSION[$key];
+    unset($_SESSION[$key]);
+
+    return $message;
 }
